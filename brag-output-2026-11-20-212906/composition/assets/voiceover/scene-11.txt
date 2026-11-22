@@ -1,1 +1,0 @@
-Under the hood, a deterministic bounded search evaluates payable timing and receivable acceleration, and selects eligible credit facilities. CashShield compares this plan with a greedy baseline using the same inputs. A separate validator checks that reserve and mandatory obligations remain satisfied. This is a bounded search, not a global optimality guarantee.

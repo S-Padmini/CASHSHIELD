@@ -1,1 +1,0 @@
-The landing page introduces the product and offers Explore Demo or Import Business Data. We will follow Explore Demo using the supplied synthetic scenario. Vardhman Precision Components is a fictional demonstration business, not a live customer.

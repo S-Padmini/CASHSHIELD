@@ -1,1 +1,0 @@
-In Payables, we can inspect due dates, amounts, MSE status, discount windows and contractual charges. Critical and mandatory items are protected. The demo also flags a supplier with unknown MSE status for verification instead of treating it as eligible.

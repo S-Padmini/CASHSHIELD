@@ -1,1 +1,0 @@
-Receivables lists expected collections, overdue status and financing eligibility. Eligible acceleration costs are illustrative estimates, not live offers. For overdue invoices, CashShield can draft follow-up messages, clearly marked for human review.

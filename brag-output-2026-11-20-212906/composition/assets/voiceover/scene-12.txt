@@ -1,1 +1,0 @@
-The recommended sequence shows actions with their dates, reasons and estimated costs. Open Why to inspect the rationale, or Show Math to review formulas and inputs. The cost model separates delay interest, lost discount, fees and financing interest when they apply.
