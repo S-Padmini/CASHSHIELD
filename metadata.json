@@ -1,0 +1,6 @@
+{
+  "name": "CashShield",
+  "description": "AI-assisted cash-crisis decision engine for Indian MSMEs combining cash-flow forecasting, rule evaluation, cost modeling, and constrained optimization.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,1 @@
+The forecast computes closing cash day by day and tests each result against the reserve. Here, CashShield detects a projected reserve breach beginning November twenty-four and a peak shortfall of eight lakh twelve thousand. The chart and driver list show where the pressure comes from.

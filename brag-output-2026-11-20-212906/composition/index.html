@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="en" data-resolution="landscape">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="node_modules/gsap/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --ink: #0f172a;
+        --muted: #64748b;
+        --ground: #f8fafc;
+        --line: #cbd5e1;
+        --green: #15803d;
+        --amber: #b45309;
+        --red: #b91c1c;
+        --dark: #0f172a;
+        --display: Arial, Helvetica, sans-serif;
+        --mono: "Courier New", monospace;
+      }
+
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--ground);
+        color: var(--ink);
+        font-family: var(--display);
+      }
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--ground);
+      }
+      .scene {
+        position: absolute;
+        inset: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+      }
+      .transition {
+        position: absolute;
+        inset: 0;
+        z-index: 20;
+        pointer-events: none;
+        background: #0f172a;
+        opacity: 0;
+      }
+      .title-scene {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        background:
+          radial-gradient(ellipse at 68% 44%, rgba(21, 128, 61, 0.24), transparent 34%),
+          linear-gradient(132deg, #0f172a 4%, #17243a 60%, #102d2b 100%);
+      }
+      .ambient {
+        position: absolute;
+        width: 760px;
+        height: 760px;
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        border-radius: 50%;
+        right: 180px;
+        top: 160px;
+        box-shadow: 0 0 110px rgba(21, 128, 61, 0.12), inset 0 0 90px rgba(21, 128, 61, 0.08);
+      }
+      .ambient::before, .ambient::after {
+        content: "";
+        position: absolute;
+        inset: 54px;
+        border: 1px solid rgba(148, 163, 184, 0.14);
+        border-radius: 50%;
+      }
+      .ambient::after { inset: 128px; }
+      .title-content {
+        position: absolute;
+        left: 180px;
+        top: 50%;
+        width: 1280px;
+        transform: translateY(-50%);
+      }
+      .overline {
+        margin: 0 0 26px;
+        color: #a7f3d0;
+        font-size: 23px;
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+      .title {
+        margin: 0;
+        font-size: 76px;
+        line-height: 1.08;
+        font-weight: 700;
+        letter-spacing: -0.045em;
+      }
+      .subtitle {
+        margin: 24px 0 0;
+        color: #cbd5e1;
+        font-size: 30px;
+        line-height: 1.4;
+      }
+      .brand-mark {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        margin-top: 40px;
+        font-size: 25px;
+        font-weight: 650;
+        letter-spacing: -0.02em;
+      }
+      .shield {
+        width: 54px;
+        height: 54px;
+        padding: 12px;
+        border-radius: 15px;
+        background: #f8fafc;
+        color: #0f172a;
+      }
+      .sequence-title {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+      .sequence-title h1 {
+        max-width: 1500px;
+        margin: 0;
+        font-size: 96px;
+        line-height: 1.08;
+        letter-spacing: -0.045em;
+      }
+      .sequence-title .team {
+        color: #a7f3d0;
+        font-size: 124px;
+        letter-spacing: 0.015em;
+      }
+      .sequence-title .domain {
+        color: white;
+        font-size: 84px;
+      }
+      .team-rule {
+        width: 130px;
+        height: 4px;
+        margin: 30px auto 0;
+        background: #34d399;
+      }
+      .ps-content {
+        position: absolute;
+        left: 160px;
+        right: 160px;
+        top: 150px;
+      }
+      .ps-label {
+        margin: 0;
+        color: #a7f3d0;
+        font-size: 22px;
+        letter-spacing: 0.16em;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+      .problem-grid {
+        display: grid;
+        grid-template-columns: 1.25fr 0.85fr;
+        gap: 30px;
+        margin-top: 32px;
+      }
+      .problem-card {
+        min-height: 590px;
+        padding: 44px 48px;
+        border: 1px solid rgba(203, 213, 225, 0.28);
+        border-radius: 20px;
+        background: rgba(248, 250, 252, 0.07);
+      }
+      .problem-card.approach {
+        border-color: rgba(52, 211, 153, 0.7);
+        background: rgba(52, 211, 153, 0.06);
+      }
+      .problem-card h2 {
+        margin: 0 0 28px;
+        color: #a7f3d0;
+        font-size: 25px;
+        line-height: 1.25;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .problem-card p {
+        margin: 0;
+        color: #f8fafc;
+        font-size: 30px;
+        line-height: 1.55;
+        letter-spacing: -0.02em;
+      }
+      .problem-card p + p { margin-top: 24px; }
+      .problem-card.approach p { font-size: 32px; }
+      .problem-card.approach h2 { max-width: 520px; }
+      .problem-card.approach p {
+        border-left: 3px solid #34d399;
+        padding-left: 24px;
+      }
+      .solution-content {
+        position: absolute;
+        left: 160px;
+        right: 160px;
+        top: 135px;
+      }
+      .solution-heading {
+        margin: 12px 0 64px;
+        color: white;
+        font-size: 78px;
+        letter-spacing: -0.04em;
+      }
+      .engine-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+      }
+      .engine-card {
+        min-height: 365px;
+        padding: 36px;
+        border: 1px solid rgba(203, 213, 225, 0.28);
+        border-radius: 20px;
+        background: rgba(248, 250, 252, 0.07);
+      }
+      .engine-card.primary { border-color: rgba(52, 211, 153, 0.7); }
+      .engine-card h2 {
+        margin: 0 0 26px;
+        font-size: 30px;
+      }
+      .engine-card p {
+        margin: 0;
+        color: #cbd5e1;
+        font-size: 24px;
+        line-height: 1.55;
+      }
+      .engine-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-top: 30px;
+      }
+      .engine-tags span {
+        padding: 12px 17px;
+        border-radius: 9px;
+        background: rgba(148, 163, 184, 0.16);
+        color: #e2e8f0;
+        font-size: 21px;
+      }
+      .screen-scene { background: #e9eef5; }
+      .screen-title {
+        position: absolute;
+        left: 160px;
+        top: 26px;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        color: #334155;
+        font-size: 28px;
+        font-weight: 650;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .screen-title .number {
+        color: #147c3b;
+        font-family: var(--mono);
+        font-size: 28px;
+      }
+      .screen-frame {
+        position: absolute;
+        left: 160px;
+        top: 82px;
+        width: 1600px;
+        height: 900px;
+        overflow: hidden;
+        border: 1px solid #cbd5e1;
+        border-radius: 16px;
+        background: white;
+        box-shadow: 0 22px 65px rgba(15, 23, 42, 0.16);
+      }
+      .screen-frame img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center top;
+      }
+      .screen-frame .screen-swap { opacity: 0; }
+      .screen-caption {
+        position: absolute;
+        left: 160px;
+        right: 160px;
+        bottom: 23px;
+        min-height: 58px;
+        color: #334155;
+        font-size: 28px;
+        line-height: 1.3;
+        font-weight: 500;
+      }
+      .screen-caption strong { color: #0f172a; }
+      .solver-panel {
+        position: absolute;
+        right: 190px;
+        bottom: 145px;
+        width: 560px;
+        padding: 28px 32px;
+        border: 1px solid #cbd5e1;
+        border-radius: 14px;
+        background: rgba(255,255,255,0.96);
+        box-shadow: 0 16px 42px rgba(15,23,42,0.16);
+      }
+      .solver-panel h2 { margin: 0 0 12px; font-size: 28px; }
+      .solver-panel p { margin: 0; color: #475569; font-size: 28px; line-height: 1.5; }
+      .result-strip {
+        position: absolute;
+        right: 190px;
+        top: 190px;
+        width: 530px;
+        padding: 26px 28px;
+        border: 1px solid #bbf7d0;
+        border-radius: 16px;
+        background: rgba(255,255,255,0.97);
+        box-shadow: 0 20px 55px rgba(15,23,42,0.18);
+      }
+      .result-strip .result-kicker {
+        margin-bottom: 22px;
+        color: #166534;
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+      }
+      .result-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 14px 0;
+        border-top: 1px solid #e2e8f0;
+        font-size: 22px;
+      }
+      .result-row span { color: #475569; }
+      .result-row strong { color: #0f172a; font-family: var(--mono); white-space: nowrap; }
+      .result-row .good { color: #15803d; }
+      .ps-footnote {
+        margin-top: 26px;
+        color: #cbd5e1;
+        font-size: 22px;
+      }
+      .bottom-brand {
+        position: absolute;
+        left: 160px;
+        bottom: 46px;
+        color: #334155;
+        font-size: 22px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .code { font-family: var(--mono); }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="240"
+      data-width="1920"
+      data-height="1080"
+      data-fps="30"
+    >
+      <section id="s01" class="clip scene title-scene" data-start="0" data-duration="18" data-track-index="1">
+        <div class="ambient camera"></div>
+        <div class="title-content entry">
+          <p class="overline">Welcome</p>
+          <h1 class="title">Good evening.</h1>
+          <p class="subtitle">Audience &amp; Evaluation Panel</p>
+        </div>
+        <div class="transition" data-layout-allow-occlusion></div>
+      </section>
+
+      <section id="s02" class="clip scene title-scene" data-start="18" data-duration="16" data-track-index="1">
+        <div class="ambient camera"></div>
+        <div id="s02-hackathon" class="sequence-title">
+          <h1>ArthaThon Hackathon</h1>
+        </div>
+        <div id="s02-team" class="sequence-title">
+          <div>
+            <h1 class="team">TEAM FINOVIX</h1>
+            <div class="team-rule"></div>
+          </div>
+        </div>
+        <div id="s02-domain" class="sequence-title">
+          <div>
+            <p class="overline">Assigned Domain</p>
+            <h1 class="domain">AI for Finance</h1>
+          </div>
+        </div>
+        <div class="transition" data-layout-allow-occlusion></div>
+      </section>
+
+      <section id="s03" class="clip scene title-scene" data-start="34" data-duration="18" data-track-index="1">
+        <div class="ambient camera"></div>
+        <div class="ps-content entry">
+          <p class="ps-label">The Problem</p>
+          <div class="problem-grid">
+            <article class="problem-card">
+              <h2>The Challenge</h2>
+              <p>Indian MSMEs often face cash-flow shortages when upcoming supplier payments exceed the cash currently available, even though customers still owe them money.</p>
+              <p>They need an intelligent way to decide which payments to prioritize or delay, when to accelerate receivables, and whether financing is necessary while protecting essential operating cash.</p>
+            </article>
+            <article class="problem-card approach">
+              <h2>How CashShield Addresses It</h2>
+              <p>CashShield recommends a feasible, lowest-estimated-cost combination of financial actions while respecting minimum cash reserves and mandatory payment obligations.</p>
+            </article>
+          </div>
+        </div>
+        <div class="transition" data-layout-allow-occlusion></div>
+      </section>
+
+      <section id="s04" class="clip scene title-scene" data-start="52" data-duration="18" data-track-index="1">
+        <div class="ambient camera"></div>
+        <div class="solution-content entry">
+          <p class="overline">Our Proposed Solution</p>
+          <h1 class="solution-heading">CashShield</h1>
+          <div class="engine-grid">
+            <article class="engine-card primary">
+              <h2>Deterministic Financial Engine</h2>
+              <p>Calculates the forecast, rule checks, itemized costs and constrained plan.</p>
+              <div class="engine-tags"><span>Forecast</span><span>Rules</span><span>Costs</span><span>Optimizer</span><span>Validator</span></div>
+            </article>
+            <article class="engine-card">
+              <h2>Subordinate AI Assistance</h2>
+              <p>Parses What-If questions, extracts candidate document fields for human review and summarizes computed outputs.</p>
+              <div class="engine-tags"><span>Assists interpretation</span><span>Never invents totals</span></div>
+            </article>
+          </div>
+          <p class="ps-footnote">AI-assisted cash-crisis decision support for Indian MSMEs</p>
+        </div>
+        <div class="transition" data-layout-allow-occlusion></div>
+      </section>
+
+      <section id="s05" class="clip scene screen-scene" data-start="70" data-duration="18" data-track-index="1">
+        <header class="screen-title entry"><span class="number">01</span><span>CashShield · Product Entry</span></header>
+        <div class="screen-frame"><img class="camera" src="assets/screens/video/landing.png" alt="Actual CashShield landing page with synthetic demo scenario" /></div>
+        <p class="screen-caption entry"><strong>Explore Demo</strong> · Follow the synthetic Vardhman Precision Components scenario.</p>
+        <div class="transition" data-layout-allow-occlusion></div>
+      </section>
+
+      <section id="s06" class="clip scene screen-scene" data-start="88" data-duration="18" data-track-index="1">
+        <header class="screen-title entry"><span class="number">02</span><span>Treasury Overview</span></header>
+        <div class="screen-frame"><img class="camera" src="assets/screens/video/overview.png" alt="Actual CashShield treasury overview" /></div>
+        <p class="screen-caption entry"><strong>₹4,00,000 opening cash</strong> · ₹1,00,000 reserve · ₹2,50,000 protected payroll.</p>
+        <div class="transition" data-layout-allow-occlusion></div>
+      </section>
+
+      <section id="s07" class="clip scene screen-scene" data-start="106" data-duration="18" data-track-index="1">
+        <header class="screen-title entry"><span class="number">03</span><span>Forecast · Reserve Breach</span></header>
+        <div class="screen-frame"><img class="camera" src="assets/screens/video/crisis.png" alt="Actual CashShield cash crisis analysis and forecast" /></div>
+        <p class="screen-caption entry"><strong>First breach: Nov 24</strong> · Trough: Nov 29 · Peak shortfall: ₹8,12,000.</p>
+        <div class="transition" data-layout-allow-occlusion></div>
+      </section>
+
+      <section id="s08" class="clip scene screen-scene" data-start="124" data-duration="18" data-track-index="1">
+        <header class="screen-title entry"><span class="number">04</span><span>Payables · Rule Eligibility</span></header>
+        <div class="screen-frame"><img class="camera" src="assets/screens/video/payables.png" alt="Actual CashShield payables table and payment rule statuses" /></div>
+        <p class="screen-caption entry">Inspect due dates, MSE status, protected obligations, discount windows and contractual terms.</p>
+        <div class="transition" data-layout-allow-occlusion></div>
+      </section>
+
+      <section id="s09" class="clip scene screen-scene" data-start="142" data-duration="18" data-track-index="1">
+        <header class="screen-title entry"><span class="number">05</span><span>Receivables · Expected Collections</span></header>
+        <div class="screen-frame"><img class="camera" src="assets/screens/video/receivables.png" alt="Actual CashShield receivables table and financing eligibility" /></div>
+        <p class="screen-caption entry">Expected payment dates · overdue status · eligible acceleration at illustrative assumptions.</p>
+        <div class="transition" data-layout-allow-occlusion></div>
+      </section>
+
+      <section id="s10" class="clip scene screen-scene" data-start="160" data-duration="18" data-track-index="1">
+        <header class="screen-title entry"><span class="number">06</span><span>What-If · Customer Pays 10 Days Late</span></header>
+        <div class="screen-frame">
+          <img id="s10-input" class="camera" src="assets/screens/video/whatif.png" alt="Actual CashShield What-If simulator" />
+          <img id="s10-result" class="camera screen-swap" src="assets/screens/video/whatif-result.png" alt="Actual baseline versus scenario comparison" />
+        </div>
+        <p class="screen-caption entry">Run the supported preset, then inspect the engine-generated baseline and scenario comparison.</p>
+        <div class="transition" data-layout-allow-occlusion></div>
+      </section>
+
+      <section id="s11" class="clip scene screen-scene" data-start="178" data-duration="22" data-track-index="1">
+        <header class="screen-title entry"><span class="number">07</span><span>Constrained Optimization</span></header>
+        <div class="screen-frame"><img class="camera" src="assets/screens/video/evidence-method.png" alt="Actual CashShield optimization method and evidence" /></div>
+        <aside class="solver-panel">
+          <h2>Bounded search · 1,500 states evaluated</h2>
+          <p>Greedy baseline comparison · exact facility-subset selection · independent constraint validator</p>
+        </aside>
+        <p class="screen-caption entry">A feasible result is validated against reserve and mandatory-obligation constraints.</p>
+        <div class="transition" data-layout-allow-occlusion></div>
+      </section>
+
+      <section id="s12" class="clip scene screen-scene" data-start="200" data-duration="16" data-track-index="1">
+        <header class="screen-title entry"><span class="number">08</span><span>Recommended Actions · Cost Explorer</span></header>
+        <div class="screen-frame"><img class="camera" src="assets/screens/video/costs.png" alt="Actual CashShield cost explorer" /></div>
+        <p class="screen-caption entry">Inspect recommendation timing, reasons and the formula behind estimated costs.</p>
+        <div class="transition" data-layout-allow-occlusion></div>
+      </section>
+
+      <section id="s13" class="clip scene screen-scene" data-start="216" data-duration="24" data-track-index="1">
+        <header class="screen-title entry"><span class="number">09</span><span>Evidence · Final Synthetic Demo Result</span></header>
+        <div class="screen-frame">
+          <img id="s13-evidence" class="camera" src="assets/screens/video/evidence-result.png" alt="Actual CashShield evidence and assumptions screen" />
+          <img id="s13-result-screen" class="camera screen-swap" src="assets/screens/video/optimized-plan-result.png" alt="Actual CashShield Compare With Plan chart showing the feasible optimized cash trajectory" />
+        </div>
+        <aside class="result-strip">
+          <p class="result-kicker">SYNTHETIC DEMO · ESTIMATES</p>
+          <div class="result-row"><span>Plan status</span><strong class="good">FEASIBLE</strong></div>
+          <div class="result-row"><span>Minimum cash after plan</span><strong>₹1,00,000</strong></div>
+          <div class="result-row"><span>Optimized estimated cost</span><strong>₹6,697</strong></div>
+          <div class="result-row"><span>Greedy baseline cost</span><strong>₹10,864</strong></div>
+        </aside>
+        <p class="screen-caption entry">Decision support only · Verify material legal, lending, tax and contractual decisions with qualified professionals.</p>
+        <div class="bottom-brand">CashShield · Team FINOVIX</div>
+        <div class="transition" data-layout-allow-occlusion></div>
+      </section>
+
+      <audio id="music-01" class="clip" data-start="0" data-duration="117.384" data-track-index="10" data-volume="0.13" src="assets/music/happy-beats-business-moves-vol-12-by-ende-dot-app.mp3"></audio>
+      <audio id="music-02" class="clip" data-start="117.384" data-duration="117.384" data-track-index="10" data-volume="0.13" src="assets/music/happy-beats-business-moves-vol-12-by-ende-dot-app.mp3"></audio>
+      <audio id="music-03" class="clip" data-start="234.768" data-duration="5.232" data-track-index="10" data-volume="0.13" src="assets/music/happy-beats-business-moves-vol-12-by-ende-dot-app.mp3"></audio>
+
+      <audio id="voice-01" class="clip" data-start="0" data-duration="13.46" data-track-index="12" data-volume="1" src="assets/voiceover/scene-01.wav"></audio>
+      <audio id="voice-02" class="clip" data-start="18" data-duration="11.90" data-track-index="12" data-volume="1" src="assets/voiceover/scene-02.wav"></audio>
+      <audio id="voice-03" class="clip" data-start="34" data-duration="16.533333" data-track-index="12" data-volume="1" src="assets/voiceover/scene-03.wav"></audio>
+      <audio id="voice-04" class="clip" data-start="52" data-duration="12.394667" data-track-index="12" data-volume="1" src="assets/voiceover/scene-04.wav"></audio>
+      <audio id="voice-05" class="clip" data-start="70" data-duration="15.25" data-track-index="12" data-volume="1" src="assets/voiceover/scene-05.wav"></audio>
+      <audio id="voice-06" class="clip" data-start="88" data-duration="15.94" data-track-index="12" data-volume="1" src="assets/voiceover/scene-06.wav"></audio>
+      <audio id="voice-07" class="clip" data-start="106" data-duration="16.66" data-track-index="12" data-volume="1" src="assets/voiceover/scene-07.wav"></audio>
+      <audio id="voice-08" class="clip" data-start="124" data-duration="16.90" data-track-index="12" data-volume="1" src="assets/voiceover/scene-08.wav"></audio>
+      <audio id="voice-09" class="clip" data-start="142" data-duration="16.19" data-track-index="12" data-volume="1" src="assets/voiceover/scene-09.wav"></audio>
+      <audio id="voice-10" class="clip" data-start="160" data-duration="16.47" data-track-index="12" data-volume="1" src="assets/voiceover/scene-10.wav"></audio>
+      <audio id="voice-11" class="clip" data-start="178" data-duration="21.99" data-track-index="12" data-volume="1" src="assets/voiceover/scene-11.wav"></audio>
+      <audio id="voice-12" class="clip" data-start="200" data-duration="14.46" data-track-index="12" data-volume="1" src="assets/voiceover/scene-12.wav"></audio>
+      <audio id="voice-13" class="clip" data-start="216" data-duration="23.17" data-track-index="12" data-volume="1" src="assets/voiceover/scene-13.wav"></audio>
+
+      <audio id="sfx-team" class="clip" data-start="22.8" data-duration="0.1833" data-track-index="11" data-volume="0.58" src="assets/sfx/impact/impactSoft_medium_001.ogg"></audio>
+      <audio id="sfx-solution" class="clip" data-start="52" data-duration="0.1229" data-track-index="11" data-volume="0.54" src="assets/sfx/interface/bong_001.ogg"></audio>
+      <audio id="sfx-demo" class="clip" data-start="78.8" data-duration="0.0101" data-track-index="11" data-volume="0.56" src="assets/sfx/interface/click_003.ogg"></audio>
+      <audio id="sfx-close" class="clip" data-start="237.4" data-duration="0.6537" data-track-index="11" data-volume="0.58" src="assets/sfx/impact/impactBell_heavy_003.ogg"></audio>
+    </div>
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      const sceneWindows = [
+        ["s01", 0, 18],
+        ["s02", 18, 16],
+        ["s03", 34, 18],
+        ["s04", 52, 18],
+        ["s05", 70, 18],
+        ["s06", 88, 18],
+        ["s07", 106, 18],
+        ["s08", 124, 18],
+        ["s09", 142, 18],
+        ["s10", 160, 18],
+        ["s11", 178, 22],
+        ["s12", 200, 16],
+        ["s13", 216, 24],
+      ];
+
+      for (const [id, start, duration] of sceneWindows) {
+        const scene = document.getElementById(id);
+        const transition = scene.querySelector(".transition");
+        if (start > 0) {
+          tl.fromTo(
+            transition,
+            { opacity: 1, immediateRender: false },
+            { opacity: 0, duration: 0.38, ease: "power2.out" },
+            start,
+          );
+        }
+        if (id !== "s01") {
+          scene.querySelectorAll(".entry").forEach((entry, index) => {
+            tl.fromTo(
+              entry,
+              { opacity: 0, y: 24, immediateRender: false },
+              { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" },
+              start + 0.25 + index * 0.08,
+            );
+          });
+        }
+        scene.querySelectorAll(".camera").forEach((camera) => {
+          tl.fromTo(
+            camera,
+            { scale: 1.035, immediateRender: false },
+            { scale: 1, duration, ease: "none" },
+            start,
+          );
+        });
+        tl.fromTo(
+          transition,
+          { opacity: 0, immediateRender: false },
+          { opacity: 1, duration: 0.32, ease: "power2.in" },
+          start + duration - 0.32,
+        );
+      }
+
+      tl.fromTo("#s01 .ambient", { x: -30, scale: 0.96 }, { x: 50, scale: 1.04, duration: 18, ease: "none" }, 0);
+      tl.fromTo("#s02 .ambient", { x: 30, scale: 0.96 }, { x: -40, scale: 1.04, duration: 16, ease: "none" }, 18);
+      tl.fromTo("#s03 .problem-card", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.65, stagger: 0.28, ease: "power3.out" }, 35.2);
+
+      tl.fromTo("#s02-hackathon", { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.65, ease: "power3.out" }, 18.35);
+      tl.to("#s02-hackathon", { opacity: 0, y: -12, duration: 0.28 }, 22.65);
+      tl.fromTo("#s02-team", { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 0.7, ease: "power3.out" }, 22.92);
+      tl.to("#s02-team", { opacity: 0, duration: 0.28 }, 27.1);
+      tl.fromTo("#s02-domain", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.65, ease: "power3.out" }, 27.38);
+
+      tl.fromTo("#s04 .engine-card", { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.7, stagger: 0.25, ease: "power3.out" }, 54.0);
+      tl.fromTo("#s10-result", { opacity: 0 }, { opacity: 1, duration: 0.65, ease: "power2.inOut" }, 169.0);
+      tl.fromTo("#s11 .solver-panel", { opacity: 0, x: 28 }, { opacity: 1, x: 0, duration: 0.65, ease: "power3.out" }, 185.0);
+      tl.fromTo("#s13-result-screen", { opacity: 0 }, { opacity: 1, duration: 0.7, ease: "power2.inOut" }, 228.0);
+      tl.fromTo("#s13 .result-strip", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 230.0);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

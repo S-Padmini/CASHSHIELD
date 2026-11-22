@@ -1,0 +1,1 @@
+What-If lets us adjust collection timing, supplier grace, financing assumptions or opening cash. We will simulate the supported preset: one customer pays ten days late. The engine re-runs the analysis and presents changes in cash, costs and recommended actions.
